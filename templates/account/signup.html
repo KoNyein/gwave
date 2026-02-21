@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Register - GreenWave</title>
+    <style>
+        body { font-family: Arial; max-width: 400px; margin: 100px auto; padding: 20px; }
+        input { width: 100%; padding: 10px; margin: 10px 0; box-sizing: border-box; }
+        button { width: 100%; padding: 10px; background: green; color: white; border: none; cursor: pointer; }
+        a { display: block; text-align: center; margin: 10px 0; }
+    </style>
+</head>
+<body>
+    <h2>🌿 GreenWave အကောင့်သစ် ဖွင့်ပါ</h2>
+    <form method="post">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit">Register လုပ်ပါ</button>
+    </form>
+    <a href="{% url 'account_login' %}">Login ဝင်ပါ</a>
+</body>
+</html>
