@@ -1,7 +1,6 @@
 import os
 PORT = os.environ.get('PORT', 8000)
 
-
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
@@ -12,6 +11,7 @@ DATABASES = {
         'PORT': os.environ.get('MYSQL_PORT'),
     }
 }
+
 
 
 
