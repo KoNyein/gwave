@@ -5,11 +5,10 @@ from pathlib import Path
 
 BASE_DIR = Path(**file**).resolve().parent.parent
 
+
+
 SECRET_KEY = os.environ.get('SECRET_KEY', 'django-insecure-change-me')
-
-
-DEBUG = False
-ALLOWED_HOSTS = [’*’]
+ALLOWED_HOSTS = ['*']
 
 INSTALLED_APPS = [
 ‘django.contrib.admin’,
