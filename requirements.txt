@@ -3,3 +3,7 @@ mysqlclient
 gunicorn
 Pillow
 django-allauth
+
+requests
+django-allauth
+
