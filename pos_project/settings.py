@@ -59,4 +59,4 @@ DATABASES = {
     }
 }
 
-LANGUAGE_CODE = 'en​​​​​​​​​​​​​​​​
+LANGUAGE_CODE = 'en​​​​​​​​​​​​​​​​-us'
