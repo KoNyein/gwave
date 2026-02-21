@@ -1,0 +1,49 @@
+{% extends 'shop/base.html' %}
+{% block title %}Sale {{ sale.sale_number }} — POS{% endblock %}
+
+{% block content %}
+<div class="page">
+  <div class="page-header">
+    <div class="page-title">🧾 Sale #{{ sale.sale_number }}</div>
+    <a href="{% url 'sales_history' %}" class="btn btn-ghost">← ပြန်သွားမည်</a>
+  </div>
+
+  <div style="display:grid;grid-template-columns:1fr 320px;gap:16px;max-width:900px">
+    <div class="card">
+      <div style="font-size:14px;font-weight:700;margin-bottom:14px;color:var(--text2)">ဝယ်ယူသောကုန်ပစ္စည်းများ</div>
+      <table>
+        <thead><tr><th>ကုန်ပစ္စည်း</th><th>ဈေးနှုန်း</th><th>အရေအတွက်</th><th>ပေးငွေ</th></tr></thead>
+        <tbody>
+          {% for item in sale.items.all %}
+          <tr>
+            <td>{{ item.product_emoji }} {{ item.product_name }}</td>
+            <td style="font-family:'JetBrains Mono',monospace">{{ item.price_mmk|floatformat:0 }} ks</td>
+            <td style="font-family:'JetBrains Mono',monospace">×{{ item.quantity }}</td>
+            <td style="font-family:'JetBrains Mono',monospace;font-weight:700;color:var(--accent)">{{ item.subtotal|floatformat:0 }} ks</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+
+    <div class="card">
+      <div style="font-size:14px;font-weight:700;margin-bottom:14px;color:var(--text2)">ငွေချေမှုအသေးစိတ်</div>
+      <div style="display:flex;flex-direction:column;gap:10px;font-size:14px">
+        <div style="display:flex;justify-content:space-between"><span style="color:var(--text2)">Sale #</span><span style="font-family:'JetBrains Mono',monospace;font-weight:700;color:var(--accent)">{{ sale.sale_number }}</span></div>
+        <div style="display:flex;justify-content:space-between"><span style="color:var(--text2)">ရက်စွဲ</span><span style="font-size:12px">{{ sale.created_at|date:"d/m/Y H:i" }}</span></div>
+        <div style="display:flex;justify-content:space-between"><span style="color:var(--text2)">Cashier</span><span>{{ sale.cashier|default:"—" }}</span></div>
+        <div style="display:flex;justify-content:space-between"><span style="color:var(--text2)">ငွေပေးချေနည်း</span><span class="badge {% if sale.payment_method == 'cash' %}badge-green{% elif sale.payment_method == 'transfer' %}badge-blue{% else %}badge-yellow{% endif %}">{{ sale.get_payment_method_display }}</span></div>
+        <div style="display:flex;justify-content:space-between"><span style="color:var(--text2)">Currency</span><span class="badge {% if sale.currency == 'MMK' %}badge-yellow{% else %}badge-blue{% endif %}">{{ sale.currency }}</span></div>
+        <hr style="border-color:var(--border)">
+        <div style="display:flex;justify-content:space-between"><span style="color:var(--text2)">စုစုပေါင်း</span><span style="font-family:'JetBrains Mono',monospace">{{ sale.subtotal|floatformat:0 }}</span></div>
+        <div style="display:flex;justify-content:space-between"><span style="color:var(--text2)">လျှော့ဈေး</span><span style="font-family:'JetBrains Mono',monospace;color:var(--accent2)">-{{ sale.discount|floatformat:0 }}</span></div>
+        <div style="display:flex;justify-content:space-between;font-weight:700;font-size:16px"><span>ပေးရမည့်ငွေ</span><span style="font-family:'JetBrains Mono',monospace;color:var(--accent)">{{ sale.total|floatformat:0 }} {{ sale.currency }}</span></div>
+        {% if sale.payment_method == 'cash' %}
+        <div style="display:flex;justify-content:space-between"><span style="color:var(--text2)">လက်ခံငွေ</span><span style="font-family:'JetBrains Mono',monospace">{{ sale.cash_received|floatformat:0 }}</span></div>
+        <div style="display:flex;justify-content:space-between"><span style="color:var(--text2)">အမ်းငွေ</span><span style="font-family:'JetBrains Mono',monospace;color:var(--green)">{{ sale.change_amount|floatformat:0 }}</span></div>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

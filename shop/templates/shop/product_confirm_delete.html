@@ -1,0 +1,21 @@
+{% extends 'shop/base.html' %}
+{% block title %}ဖျက်မည် — POS{% endblock %}
+{% block content %}
+<div class="page">
+  <div class="card" style="max-width:440px;margin:60px auto;text-align:center">
+    <div style="font-size:48px;margin-bottom:16px">🗑️</div>
+    <div style="font-size:18px;font-weight:700;margin-bottom:8px">ဖျက်မည်လား?</div>
+    <div style="color:var(--text2);margin-bottom:24px;font-size:14px">
+      <strong>{{ product.emoji }} {{ product.name }}</strong> ကို ဖျက်မည်လား?<br>
+      (ရောင်းအားစာရင်းများ မပျက်ဘဲ ကုန်ပစ္စည်းစာရင်းမှသာ ဖယ်ထုတ်သည်)
+    </div>
+    <div style="display:flex;gap:10px;justify-content:center">
+      <form method="post">
+        {% csrf_token %}
+        <button type="submit" class="btn btn-danger">🗑️ ဟုတ်ကဲ့ ဖျက်မည်</button>
+      </form>
+      <a href="{% url 'product_list' %}" class="btn btn-ghost">မဖျက်တော့ပါ</a>
+    </div>
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,160 @@
+{% extends 'shop/base.html' %}
+{% block title %}Dashboard — POS{% endblock %}
+
+{% block extra_head %}
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<style>
+.stats-grid { display:grid; grid-template-columns:repeat(4,1fr); gap:16px; margin-bottom:24px; }
+.stat-card { background:var(--surface); border:1px solid var(--border); border-radius:var(--radius); padding:20px; position:relative; overflow:hidden; }
+.stat-card::before { content:''; position:absolute; top:0; right:0; width:60px; height:60px; border-radius:0 0 0 60px; opacity:0.08; }
+.stat-card.yellow::before { background:var(--accent); }
+.stat-card.green::before { background:var(--green); }
+.stat-card.blue::before { background:var(--thb); }
+.stat-card.red::before { background:var(--red); }
+.stat-icon { font-size:24px; margin-bottom:10px; display:block; }
+.stat-val { font-family:'JetBrains Mono',monospace; font-size:22px; font-weight:700; margin-bottom:4px; }
+.stat-label { font-size:12px; color:var(--text2); }
+.stat-sub { font-size:11px; color:var(--text2); margin-top:6px; }
+
+.charts-grid { display:grid; grid-template-columns:2fr 1fr; gap:16px; margin-bottom:24px; }
+.chart-card { background:var(--surface); border:1px solid var(--border); border-radius:var(--radius); padding:20px; }
+.chart-hdr { display:flex; justify-content:space-between; align-items:center; margin-bottom:16px; }
+.chart-title { font-size:15px; font-weight:700; }
+.chart-toggle { display:flex; gap:6px; }
+.ct-btn { padding:5px 12px; border-radius:20px; border:1px solid var(--border); background:var(--surface2); color:var(--text2); font-size:11px; cursor:pointer; transition:all 0.2s; }
+.ct-btn.active { background:var(--accent); color:#000; border-color:var(--accent); }
+
+.alerts-card { background:var(--surface); border:1px solid var(--border); border-radius:var(--radius); padding:20px; }
+.alerts-title { font-size:15px; font-weight:700; margin-bottom:14px; }
+.alert-item { display:flex; align-items:center; gap:10px; padding:10px; background:var(--surface2); border-radius:8px; margin-bottom:8px; border:1px solid var(--border); }
+.alert-item.danger { border-color:rgba(248,113,113,0.3); background:rgba(248,113,113,0.05); }
+.alert-item.warn { border-color:rgba(245,200,66,0.3); background:rgba(245,200,66,0.05); }
+.alert-emoji { font-size:20px; }
+.alert-info { flex:1; }
+.alert-name { font-size:13px; font-weight:600; }
+.alert-stock { font-size:11px; margin-top:2px; font-family:'JetBrains Mono',monospace; }
+.danger .alert-stock { color:var(--red); }
+.warn .alert-stock { color:var(--accent); }
+.no-alerts { text-align:center; color:var(--text2); padding:20px; font-size:13px; }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="page">
+  <div class="page-header">
+    <div class="page-title">📊 Dashboard</div>
+    <a href="{% url 'pos' %}" class="btn btn-primary">🏪 POS သို့သွားမည်</a>
+  </div>
+
+  <!-- STAT CARDS -->
+  <div class="stats-grid" id="statsGrid">
+    <div class="stat-card yellow"><span class="stat-icon">💰</span><div class="stat-val" id="todayRev">Loading...</div><div class="stat-label">ယနေ့ ရောင်းရငွေ</div></div>
+    <div class="stat-card green"><span class="stat-icon">📅</span><div class="stat-val" id="monthRev">Loading...</div><div class="stat-label">ဤလ ရောင်းရငွေ</div></div>
+    <div class="stat-card blue"><span class="stat-icon">🧾</span><div class="stat-val" id="todayCount">-</div><div class="stat-label">ယနေ့ ငွေရှင်းမှု <span id="monthCount" style="font-size:11px;color:var(--text2)"></span></div></div>
+    <div class="stat-card red"><span class="stat-icon">📦</span><div class="stat-val" id="stockAlert">-</div><div class="stat-label">Stock သတိပေး</div></div>
+  </div>
+
+  <!-- CHARTS + ALERTS -->
+  <div class="charts-grid">
+    <div class="chart-card">
+      <div class="chart-hdr">
+        <div class="chart-title">📈 ရောင်းအားဂရပ်</div>
+        <div class="chart-toggle">
+          <button class="ct-btn active" onclick="loadChart('daily',this)">ရက်စဉ်</button>
+          <button class="ct-btn" onclick="loadChart('monthly',this)">လစဉ်</button>
+        </div>
+      </div>
+      <canvas id="salesChart" height="100"></canvas>
+    </div>
+
+    <div class="alerts-card">
+      <div class="alerts-title">⚠️ Stock သတိပေး</div>
+      {% if out_of_stock %}
+        {% for p in out_of_stock %}
+        <div class="alert-item danger">
+          <span class="alert-emoji">{{ p.emoji }}</span>
+          <div class="alert-info">
+            <div class="alert-name">{{ p.name }}</div>
+            <div class="alert-stock">❌ ကုန်နေပြီ!</div>
+          </div>
+          <a href="{% url 'product_edit' p.pk %}" class="btn btn-sm btn-ghost">ဖြည့်မည်</a>
+        </div>
+        {% endfor %}
+      {% endif %}
+      {% if low_stock %}
+        {% for p in low_stock %}
+        <div class="alert-item warn">
+          <span class="alert-emoji">{{ p.emoji }}</span>
+          <div class="alert-info">
+            <div class="alert-name">{{ p.name }}</div>
+            <div class="alert-stock">⚠️ {{ p.stock }} ကျန်</div>
+          </div>
+          <a href="{% url 'product_edit' p.pk %}" class="btn btn-sm btn-ghost">ဖြည့်မည်</a>
+        </div>
+        {% endfor %}
+      {% endif %}
+      {% if not out_of_stock and not low_stock %}
+        <div class="no-alerts">✅ Stock အားလုံး ကောင်းနေပါသည်</div>
+      {% endif %}
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+let chart = null;
+
+async function loadStats() {
+  const res = await fetch('/api/dashboard-stats/');
+  const d = await res.json();
+  document.getElementById('todayRev').textContent = d.today_revenue.toLocaleString() + ' ks';
+  document.getElementById('monthRev').textContent = d.month_revenue.toLocaleString() + ' ks';
+  document.getElementById('todayCount').textContent = d.today_count;
+  document.getElementById('monthCount').textContent = `(ဤလ: ${d.month_count})`;
+  document.getElementById('stockAlert').textContent = d.low_stock_count + d.out_of_stock_count;
+}
+
+async function loadChart(type, btn) {
+  document.querySelectorAll('.ct-btn').forEach(b => b.classList.remove('active'));
+  if (btn) btn.classList.add('active');
+  const res = await fetch(`/api/sales-chart/?type=${type}`);
+  const d = await res.json();
+  if (chart) chart.destroy();
+  const ctx = document.getElementById('salesChart').getContext('2d');
+  chart = new Chart(ctx, {
+    type: 'bar',
+    data: {
+      labels: d.labels,
+      datasets: [{
+        label: 'ရောင်းရငွေ (MMK)',
+        data: d.values,
+        backgroundColor: 'rgba(245,200,66,0.15)',
+        borderColor: '#f5c842',
+        borderWidth: 2,
+        borderRadius: 6,
+        hoverBackgroundColor: 'rgba(245,200,66,0.3)',
+      }]
+    },
+    options: {
+      responsive: true,
+      plugins: {
+        legend: { display: false },
+        tooltip: {
+          callbacks: {
+            label: ctx => ctx.parsed.y.toLocaleString() + ' ks'
+          }
+        }
+      },
+      scales: {
+        x: { ticks: { color:'#888', font:{size:10} }, grid:{color:'#2e2e2e'} },
+        y: { ticks: { color:'#888', font:{size:10}, callback: v => v.toLocaleString() }, grid:{color:'#2e2e2e'} }
+      }
+    }
+  });
+}
+
+loadStats();
+loadChart('daily', null);
+</script>
+{% endblock %}

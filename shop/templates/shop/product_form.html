@@ -1,0 +1,61 @@
+{% extends 'shop/base.html' %}
+{% block title %}{{ action }} ကုန်ပစ္စည်း — POS{% endblock %}
+
+{% block content %}
+<div class="page">
+  <div class="page-header">
+    <div class="page-title">{% if action == 'Add' %}➕ ကုန်ပစ္စည်း ထည့်မည်{% else %}✏️ ကုန်ပစ္စည်း ပြင်မည်{% endif %}</div>
+    <a href="{% url 'product_list' %}" class="btn btn-ghost">← ပြန်သွားမည်</a>
+  </div>
+
+  <div class="card" style="max-width:560px">
+    <form method="post">
+      {% csrf_token %}
+      <div style="display:grid;grid-template-columns:80px 1fr;gap:16px;margin-bottom:18px">
+        <div class="form-group" style="margin:0">
+          <label class="form-label">Emoji</label>
+          <input type="text" name="emoji" class="form-control" value="{{ product.emoji|default:'🛍️' }}" placeholder="🛍️" maxlength="10">
+        </div>
+        <div class="form-group" style="margin:0">
+          <label class="form-label">ကုန်ပစ္စည်းအမည် *</label>
+          <input type="text" name="name" class="form-control" value="{{ product.name|default:'' }}" placeholder="ဥပမာ: ကော်ဖီ" required>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Category</label>
+        <select name="category" class="form-control">
+          <option value="">-- Category ရွေးပါ --</option>
+          {% for cat in categories %}
+            <option value="{{ cat.id }}" {% if product.category_id == cat.id %}selected{% endif %}>{{ cat }}</option>
+          {% endfor %}
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">ဈေးနှုန်း (MMK) *</label>
+        <input type="number" name="price_mmk" class="form-control" value="{{ product.price_mmk|default:'' }}" placeholder="1500" min="0" required>
+        <div style="font-size:12px;color:var(--text2);margin-top:5px">THB ≈ ဈေးနှုန်း ÷ 85 (အလိုအလျောက် တွက်ပေးသည်)</div>
+      </div>
+
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
+        <div class="form-group">
+          <label class="form-label">Stock အရေအတွက်</label>
+          <input type="number" name="stock" class="form-control" value="{{ product.stock|default:'0' }}" min="0">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Low Stock သတ်မှတ်ချက်</label>
+          <input type="number" name="low_stock_threshold" class="form-control" value="{{ product.low_stock_threshold|default:'5' }}" min="1">
+        </div>
+      </div>
+
+      <div style="display:flex;gap:10px;margin-top:8px">
+        <button type="submit" class="btn btn-primary" style="flex:1">
+          {% if action == 'Add' %}✅ ထည့်မည်{% else %}💾 သိမ်းမည်{% endif %}
+        </button>
+        <a href="{% url 'product_list' %}" class="btn btn-ghost">ဖျက်မည်</a>
+      </div>
+    </form>
+  </div>
+</div>
+{% endblock %}

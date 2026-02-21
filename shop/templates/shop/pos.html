@@ -1,0 +1,387 @@
+{% extends 'shop/base.html' %}
+{% block title %}POS — Retail Shop{% endblock %}
+
+{% block extra_head %}
+<style>
+body { overflow: hidden; }
+.pos-wrap { display: grid; grid-template-columns: 1fr 380px; height: calc(100vh - 58px); }
+
+/* PRODUCTS SIDE */
+.products-panel { display:flex; flex-direction:column; overflow:hidden; border-right:1px solid var(--border); }
+.search-row { padding:14px 16px; border-bottom:1px solid var(--border); display:flex; gap:10px; }
+.search-row input { flex:1; background:var(--surface2); border:1px solid var(--border); border-radius:8px; padding:9px 14px; color:var(--text); font-size:14px; font-family:'Space Grotesk',sans-serif; outline:none; transition:border-color 0.2s; }
+.search-row input:focus { border-color:var(--accent); }
+.search-row input::placeholder { color:var(--text2); }
+.cur-toggle { display:flex; gap:6px; }
+.cur-btn { padding:6px 14px; border-radius:20px; border:1px solid var(--border); background:transparent; color:var(--text2); font-family:'JetBrains Mono',monospace; font-size:12px; font-weight:700; cursor:pointer; transition:all 0.2s; }
+.cur-btn.mmk { background:var(--accent); color:#000; border-color:var(--accent); }
+.cur-btn.thb { background:var(--thb); color:#000; border-color:var(--thb); }
+
+.categories { display:flex; gap:6px; padding:10px 16px; border-bottom:1px solid var(--border); overflow-x:auto; flex-shrink:0; }
+.categories::-webkit-scrollbar { display:none; }
+.cat-btn { padding:5px 14px; border-radius:20px; border:1px solid var(--border); background:var(--surface2); color:var(--text2); font-size:12px; cursor:pointer; white-space:nowrap; transition:all 0.15s; font-family:'Space Grotesk',sans-serif; }
+.cat-btn.active, .cat-btn:hover { background:var(--accent); color:#000; border-color:var(--accent); }
+
+.product-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(130px,1fr)); gap:10px; padding:14px; overflow-y:auto; align-content:start; }
+.product-grid::-webkit-scrollbar { width:4px; }
+.product-grid::-webkit-scrollbar-thumb { background:var(--border); border-radius:2px; }
+.p-card { background:var(--surface); border:1px solid var(--border); border-radius:10px; padding:12px; cursor:pointer; transition:all 0.15s; position:relative; }
+.p-card:hover { border-color:var(--accent); transform:translateY(-2px); box-shadow:0 6px 20px rgba(245,200,66,0.1); }
+.p-card.oos { opacity:0.4; cursor:not-allowed; }
+.p-emoji { font-size:28px; display:block; margin-bottom:7px; }
+.p-name { font-size:12px; font-weight:600; margin-bottom:3px; line-height:1.3; }
+.p-price { font-family:'JetBrains Mono',monospace; font-size:12px; font-weight:700; }
+.p-mmk { color:var(--accent); } .p-thb { color:var(--thb); }
+.p-stock { position:absolute; top:6px; right:6px; font-size:9px; padding:2px 5px; border-radius:4px; font-family:'JetBrains Mono',monospace; }
+.s-normal { background:var(--surface2); color:var(--text2); }
+.s-low { background:rgba(248,113,113,0.15); color:var(--red); }
+.s-out { background:rgba(248,113,113,0.15); color:var(--red); }
+
+/* CART SIDE */
+.cart-panel { display:flex; flex-direction:column; background:var(--surface); }
+.cart-hdr { padding:14px 18px; border-bottom:1px solid var(--border); display:flex; justify-content:space-between; align-items:center; flex-shrink:0; }
+.cart-title { font-weight:700; font-size:15px; }
+.cart-count { background:var(--accent); color:#000; font-size:11px; font-weight:700; padding:2px 8px; border-radius:10px; font-family:'JetBrains Mono',monospace; }
+.clear-btn { font-size:11px; color:var(--text2); background:none; border:1px solid var(--border); padding:4px 9px; border-radius:6px; cursor:pointer; transition:all 0.2s; }
+.clear-btn:hover { color:var(--red); border-color:var(--red); }
+
+.cart-body { flex:1; overflow-y:auto; padding:10px; }
+.cart-body::-webkit-scrollbar { width:4px; }
+.cart-body::-webkit-scrollbar-thumb { background:var(--border); border-radius:2px; }
+.cart-empty { display:flex; flex-direction:column; align-items:center; justify-content:center; height:100%; color:var(--text2); gap:8px; }
+.c-item { display:flex; align-items:center; gap:8px; padding:9px; background:var(--surface2); border-radius:8px; margin-bottom:6px; border:1px solid var(--border); animation:si 0.2s ease; }
+@keyframes si { from{opacity:0;transform:translateX(8px)} to{opacity:1;transform:none} }
+.c-emoji { font-size:20px; flex-shrink:0; }
+.c-info { flex:1; min-width:0; }
+.c-name { font-size:12px; font-weight:600; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.c-unit { font-size:11px; color:var(--text2); font-family:'JetBrains Mono',monospace; }
+.qty-ctrl { display:flex; align-items:center; gap:4px; }
+.q-btn { width:24px; height:24px; border-radius:5px; border:1px solid var(--border); background:var(--surface); color:var(--text); font-size:14px; cursor:pointer; display:flex; align-items:center; justify-content:center; transition:all 0.15s; }
+.q-btn:hover { background:var(--accent); color:#000; border-color:var(--accent); }
+.q-num { font-family:'JetBrains Mono',monospace; font-size:13px; font-weight:700; min-width:18px; text-align:center; }
+.c-total { font-family:'JetBrains Mono',monospace; font-size:12px; font-weight:700; min-width:68px; text-align:right; }
+
+/* FOOTER */
+.cart-foot { border-top:1px solid var(--border); padding:14px 18px; flex-shrink:0; }
+.disc-row { display:flex; gap:7px; margin-bottom:10px; }
+.disc-row input, .disc-row select { background:var(--surface2); border:1px solid var(--border); border-radius:7px; padding:7px 11px; color:var(--text); font-size:13px; font-family:'JetBrains Mono',monospace; outline:none; }
+.disc-row input { flex:1; } .disc-row input:focus { border-color:var(--accent2); }
+.totals { margin-bottom:12px; }
+.t-row { display:flex; justify-content:space-between; font-size:13px; color:var(--text2); padding:3px 0; }
+.t-grand { font-size:18px; font-weight:700; color:var(--text); padding:8px 0; border-top:1px solid var(--border); margin-top:5px; }
+.t-grand .tl { font-family:'Space Grotesk',sans-serif; font-size:13px; }
+.pay-methods { display:flex; gap:5px; margin-bottom:9px; }
+.pm-btn { flex:1; padding:7px 4px; border-radius:7px; border:1px solid var(--border); background:var(--surface2); color:var(--text2); font-size:11px; cursor:pointer; text-align:center; transition:all 0.2s; font-family:'Space Grotesk',sans-serif; }
+.pm-btn.active { border-color:var(--accent); color:var(--accent); background:rgba(245,200,66,0.07); }
+.cash-row { display:flex; gap:7px; align-items:center; margin-bottom:7px; }
+.cash-row label { font-size:12px; color:var(--text2); flex-shrink:0; }
+.cash-row input { flex:1; background:var(--surface2); border:1px solid var(--border); border-radius:7px; padding:7px 11px; color:var(--text); font-size:14px; font-family:'JetBrains Mono',monospace; font-weight:700; outline:none; transition:border-color 0.2s; }
+.cash-row input:focus { border-color:var(--green); }
+.change-box { background:rgba(74,222,128,0.08); border:1px solid rgba(74,222,128,0.2); border-radius:7px; padding:7px 11px; display:flex; justify-content:space-between; align-items:center; margin-bottom:10px; }
+.change-box .cl { font-size:11px; color:var(--text2); }
+.change-box .ca { font-size:15px; font-weight:700; color:var(--green); font-family:'JetBrains Mono',monospace; }
+.checkout-btn { width:100%; padding:13px; background:var(--accent); color:#000; border:none; border-radius:10px; font-size:15px; font-weight:700; cursor:pointer; font-family:'Space Grotesk',sans-serif; transition:all 0.2s; }
+.checkout-btn:hover { opacity:0.9; transform:translateY(-1px); }
+.checkout-btn:disabled { opacity:0.3; cursor:not-allowed; transform:none; }
+
+/* RECEIPT */
+.modal { position:fixed; inset:0; background:rgba(0,0,0,0.85); display:none; align-items:center; justify-content:center; z-index:100; backdrop-filter:blur(6px); }
+.modal.open { display:flex; }
+.receipt { background:#fff; color:#111; width:320px; border-radius:14px; overflow:hidden; animation:pop 0.25s cubic-bezier(0.34,1.56,0.64,1); }
+@keyframes pop { from{opacity:0;transform:scale(0.85)} to{opacity:1;transform:scale(1)} }
+.r-head { background:#111; color:#fff; padding:20px; text-align:center; }
+.r-shop { font-size:18px; font-weight:700; }
+.r-sub { font-size:11px; color:#777; margin-top:3px; font-family:'JetBrains Mono',monospace; }
+.r-body { padding:18px; }
+.r-line { display:flex; justify-content:space-between; font-size:12px; padding:3px 0; font-family:'JetBrains Mono',monospace; }
+.r-div { border:none; border-top:1px dashed #ddd; margin:9px 0; }
+.r-total { display:flex; justify-content:space-between; font-size:17px; font-weight:700; padding:6px 0; font-family:'JetBrains Mono',monospace; }
+.r-change { background:#f0fdf4; border-radius:7px; padding:9px; text-align:center; margin:9px 0; }
+.r-change .label { font-size:10px; color:#666; }
+.r-change .amount { font-size:18px; font-weight:700; color:#16a34a; font-family:'JetBrains Mono',monospace; }
+.r-thanks { text-align:center; font-size:11px; color:#999; padding:8px 0; }
+.r-actions { display:flex; gap:8px; padding:0 18px 18px; }
+.r-actions button { flex:1; padding:9px; border-radius:7px; border:none; cursor:pointer; font-size:13px; font-weight:600; font-family:'Space Grotesk',sans-serif; }
+.btn-print { background:#111; color:#fff; }
+.btn-close-r { background:#f3f4f6; color:#111; }
+.toast { position:fixed; bottom:28px; left:50%; transform:translateX(-50%) translateY(16px); background:var(--surface); border:1px solid var(--border); color:var(--text); padding:9px 20px; border-radius:30px; font-size:13px; opacity:0; transition:all 0.3s; z-index:200; pointer-events:none; white-space:nowrap; }
+.toast.show { opacity:1; transform:translateX(-50%) translateY(0); }
+@media print { body>*:not(.modal) { display:none; } .modal { display:flex!important; background:#fff; } .r-actions { display:none; } }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="pos-wrap">
+  <!-- PRODUCTS -->
+  <div class="products-panel">
+    <div class="search-row">
+      <input type="text" id="searchInput" placeholder="ကုန်ပစ္စည်း ရှာမယ်...">
+      <div class="cur-toggle">
+        <button class="cur-btn mmk" id="btnMMK" onclick="setCur('MMK')">MMK</button>
+        <button class="cur-btn" id="btnTHB" onclick="setCur('THB')">THB</button>
+      </div>
+    </div>
+    <div class="categories" id="cats"></div>
+    <div class="product-grid" id="grid"></div>
+  </div>
+
+  <!-- CART -->
+  <div class="cart-panel">
+    <div class="cart-hdr">
+      <span class="cart-title">🛒 ငွေတောင်းခံလွှာ</span>
+      <div style="display:flex;gap:7px;align-items:center">
+        <span class="cart-count" id="cartCount">0</span>
+        <button class="clear-btn" onclick="clearCart()">ဖျက်မည်</button>
+      </div>
+    </div>
+    <div class="cart-body" id="cartBody">
+      <div class="cart-empty"><div style="font-size:44px;opacity:.3">🛍️</div><p style="font-size:13px">ကုန်ပစ္စည်း မရွေးရသေးပါ</p></div>
+    </div>
+    <div class="cart-foot">
+      <div class="disc-row">
+        <input type="number" id="discVal" placeholder="လျှော့ဈေး" min="0">
+        <select id="discType"><option value="flat">ကျပ်/฿</option><option value="pct">%</option></select>
+      </div>
+      <div class="totals">
+        <div class="t-row"><span>စုစုပေါင်း</span><span id="sub">0</span></div>
+        <div class="t-row"><span>လျှော့ဈေး</span><span id="disc" style="color:var(--accent2)">-0</span></div>
+        <div class="t-row t-grand"><span class="tl">ပေးရမည့်ငွေ</span><span id="grand">0</span></div>
+      </div>
+      <div class="pay-methods">
+        <button class="pm-btn active" id="pm-cash" onclick="setPay('cash')">💵 Cash</button>
+        <button class="pm-btn" id="pm-transfer" onclick="setPay('transfer')">📱 Transfer</button>
+        <button class="pm-btn" id="pm-card" onclick="setPay('card')">💳 Card</button>
+      </div>
+      <div id="cashSect">
+        <div class="cash-row">
+          <label>လက်ခံငွေ</label>
+          <input type="number" id="cashIn" placeholder="0" min="0">
+        </div>
+        <div class="change-box">
+          <span class="cl">အမ်းငွေ</span>
+          <span class="ca" id="changeLbl">0</span>
+        </div>
+      </div>
+      <button class="checkout-btn" id="checkoutBtn" disabled onclick="checkout()">ငွေရှင်းမည် ✓</button>
+    </div>
+  </div>
+</div>
+
+<!-- RECEIPT MODAL -->
+<div class="modal" id="modal">
+  <div class="receipt">
+    <div class="r-head">
+      <div class="r-shop">🏪 Retail Shop</div>
+      <div class="r-sub" id="rDate"></div>
+    </div>
+    <div class="r-body">
+      <div id="rItems"></div>
+      <hr class="r-div">
+      <div class="r-line"><span>လျှော့ဈေး</span><span id="rDisc">-0</span></div>
+      <div class="r-total"><span>စုစုပေါင်း</span><span id="rTotal"></span></div>
+      <div class="r-change" id="rChangeSect">
+        <div class="label">အမ်းငွေ</div>
+        <div class="amount" id="rChange"></div>
+      </div>
+      <div class="r-thanks">မည်ကျေးဇူးတင်ပါသည် ♡</div>
+    </div>
+    <div class="r-actions">
+      <button class="btn-print" onclick="window.print()">🖨️ Print</button>
+      <button class="btn-close-r" onclick="closeModal()">ပိတ်မည်</button>
+    </div>
+  </div>
+</div>
+<div class="toast" id="toast"></div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+const CSRF = '{{ csrf_token }}';
+const EX = 85; // 1 THB = 85 MMK
+let products = [], cart = [], cur = 'MMK', pay = 'cash', activeCat = 'All';
+
+// Load products from backend
+async function loadProducts() {
+  const res = await fetch('/api/products/');
+  const data = await res.json();
+  products = data.products;
+  renderCats(); renderGrid();
+}
+
+function fmt(mmk) {
+  if (cur === 'THB') return '฿' + Math.round(mmk / EX).toLocaleString();
+  return mmk.toLocaleString() + ' ks';
+}
+
+function setCur(c) {
+  cur = c;
+  document.getElementById('btnMMK').className = 'cur-btn' + (c === 'MMK' ? ' mmk' : '');
+  document.getElementById('btnTHB').className = 'cur-btn' + (c === 'THB' ? ' thb' : '');
+  renderGrid(); renderCart(); updateTotals();
+}
+
+function renderCats() {
+  const cats = ['All', ...new Set(products.map(p => p.category))];
+  document.getElementById('cats').innerHTML = cats.map(c =>
+    `<button class="cat-btn${c===activeCat?' active':''}" onclick="setCat('${c}')">${c}</button>`
+  ).join('');
+}
+
+function setCat(c) { activeCat = c; renderCats(); renderGrid(); }
+
+function renderGrid() {
+  const q = document.getElementById('searchInput').value.toLowerCase();
+  const filtered = products.filter(p =>
+    (activeCat === 'All' || p.category === activeCat) && p.name.toLowerCase().includes(q)
+  );
+  const g = document.getElementById('grid');
+  if (!filtered.length) { g.innerHTML = `<div style="grid-column:1/-1;text-align:center;color:var(--text2);padding:40px;font-size:14px">ကုန်ပစ္စည်း မတွေ့ပါ</div>`; return; }
+  g.innerHTML = filtered.map(p => {
+    const price = cur === 'THB'
+      ? `<span class="p-price p-thb">฿${Math.round(p.price_thb).toLocaleString()}</span>`
+      : `<span class="p-price p-mmk">${p.price_mmk.toLocaleString()} ks</span>`;
+    const stockBadge = p.is_out_of_stock
+      ? `<span class="p-stock s-out">ကုန်</span>`
+      : p.is_low_stock ? `<span class="p-stock s-low">⚠️${p.stock}</span>`
+      : `<span class="p-stock s-normal">${p.stock}</span>`;
+    return `<div class="p-card${p.is_out_of_stock?' oos':''}" onclick="${!p.is_out_of_stock?`addCart(${p.id})`:''}">
+      ${stockBadge}
+      <span class="p-emoji">${p.emoji}</span>
+      <div class="p-name">${p.name}</div>${price}
+    </div>`;
+  }).join('');
+}
+
+function addCart(id) {
+  const p = products.find(x => x.id === id);
+  if (!p || p.is_out_of_stock) return;
+  const ex = cart.find(x => x.id === id);
+  if (ex) {
+    if (ex.qty >= p.stock) { toast('⚠️ Stock မလုံပါ'); return; }
+    ex.qty++;
+  } else { cart.push({...p, qty:1}); }
+  renderCart(); updateTotals(); toast(`✓ ${p.name} ထည့်လိုက်သည်`);
+}
+
+function rmCart(id) {
+  const i = cart.findIndex(x => x.id === id);
+  if (i < 0) return;
+  if (cart[i].qty > 1) cart[i].qty--; else cart.splice(i, 1);
+  renderCart(); updateTotals();
+}
+
+function clearCart() {
+  cart = [];
+  document.getElementById('discVal').value = '';
+  document.getElementById('cashIn').value = '';
+  renderCart(); updateTotals();
+}
+
+function renderCart() {
+  document.getElementById('cartCount').textContent = cart.reduce((s,c)=>s+c.qty,0);
+  const el = document.getElementById('cartBody');
+  if (!cart.length) { el.innerHTML = `<div class="cart-empty"><div style="font-size:44px;opacity:.3">🛍️</div><p style="font-size:13px">ကုန်ပစ္စည်း မရွေးရသေးပါ</p></div>`; return; }
+  el.innerHTML = cart.map(it => `
+    <div class="c-item">
+      <span class="c-emoji">${it.emoji}</span>
+      <div class="c-info">
+        <div class="c-name">${it.name}</div>
+        <div class="c-unit">${fmt(it.price_mmk)} × ${it.qty}</div>
+      </div>
+      <div class="qty-ctrl">
+        <button class="q-btn" onclick="rmCart(${it.id})">−</button>
+        <span class="q-num">${it.qty}</span>
+        <button class="q-btn" onclick="addCart(${it.id})">+</button>
+      </div>
+      <span class="c-total" style="color:${cur==='THB'?'var(--thb)':'var(--accent)'}">${fmt(it.price_mmk*it.qty)}</span>
+    </div>`).join('');
+}
+
+function getSub() { return cart.reduce((s,c)=>s+c.price_mmk*c.qty,0); }
+function getDisc(sub) {
+  const v = parseFloat(document.getElementById('discVal').value)||0;
+  const t = document.getElementById('discType').value;
+  if (t==='pct') return Math.min(sub, sub*v/100);
+  return cur==='THB' ? Math.min(sub, v*EX) : Math.min(sub, v);
+}
+
+function updateTotals() {
+  const sub = getSub(), disc = getDisc(sub), grand = sub - disc;
+  document.getElementById('sub').textContent = fmt(sub);
+  document.getElementById('disc').textContent = '-' + fmt(disc);
+  document.getElementById('grand').textContent = fmt(grand);
+  document.getElementById('grand').style.color = cur==='THB'?'var(--thb)':'var(--accent)';
+  updateChange();
+  document.getElementById('checkoutBtn').disabled = !cart.length;
+}
+
+function updateChange() {
+  const sub = getSub(), disc = getDisc(sub), grand = sub - disc;
+  const raw = parseFloat(document.getElementById('cashIn').value)||0;
+  const mmk = cur==='THB' ? raw*EX : raw;
+  document.getElementById('changeLbl').textContent = fmt(Math.max(0, mmk - grand));
+}
+
+function setPay(m) {
+  pay = m;
+  ['cash','transfer','card'].forEach(x => document.getElementById('pm-'+x).className='pm-btn'+(x===m?' active':''));
+  document.getElementById('cashSect').style.display = m==='cash'?'block':'none';
+}
+
+async function checkout() {
+  if (!cart.length) return;
+  const sub = getSub(), disc = getDisc(sub), grand = sub - disc;
+  const rawCash = parseFloat(document.getElementById('cashIn').value)||0;
+  const cashMmk = cur==='THB' ? rawCash*EX : rawCash;
+  if (pay==='cash' && cashMmk < grand) { toast('⚠️ ငွေမလုံပါ'); return; }
+
+  const payload = {
+    cart: cart.map(c => ({id:c.id, qty:c.qty})),
+    currency: cur, payment_method: pay,
+    discount_mmk: Math.round(disc),
+    cash_received_mmk: Math.round(cashMmk),
+  };
+
+  try {
+    const res = await fetch('/api/checkout/', {
+      method:'POST',
+      headers:{'Content-Type':'application/json','X-CSRFToken':CSRF},
+      body: JSON.stringify(payload),
+    });
+    const data = await res.json();
+    if (!data.success) { toast('❌ ' + (data.error||'Error')); return; }
+
+    // Show receipt
+    const now = new Date();
+    document.getElementById('rDate').textContent = now.toLocaleDateString('my-MM') + ' | ' + now.toLocaleTimeString('my-MM') + ' | #' + data.sale_number;
+    document.getElementById('rItems').innerHTML = cart.map(it => `<div class="r-line"><span>${it.emoji} ${it.name} ×${it.qty}</span><span>${fmt(it.price_mmk*it.qty)}</span></div>`).join('');
+    document.getElementById('rDisc').textContent = '-' + fmt(Math.round(disc));
+    document.getElementById('rTotal').textContent = fmt(data.total);
+    const cs = document.getElementById('rChangeSect');
+    if (pay==='cash') { cs.style.display='block'; document.getElementById('rChange').textContent = fmt(data.change); }
+    else { cs.style.display='none'; }
+    document.getElementById('modal').classList.add('open');
+
+    // Update local stock
+    cart.forEach(ci => { const p = products.find(x=>x.id===ci.id); if(p) { p.stock -= ci.qty; p.is_low_stock = p.stock<=5&&p.stock>0; p.is_out_of_stock = p.stock===0; } });
+  } catch(e) { toast('❌ Server Error'); }
+}
+
+function closeModal() { document.getElementById('modal').classList.remove('open'); clearCart(); renderGrid(); }
+
+function toast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg; t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2000);
+}
+
+document.getElementById('searchInput').addEventListener('input', renderGrid);
+document.getElementById('discVal').addEventListener('input', updateTotals);
+document.getElementById('discType').addEventListener('change', updateTotals);
+document.getElementById('cashIn').addEventListener('input', updateChange);
+
+loadProducts();
+setPay('cash');
+updateTotals();
+</script>
+{% endblock %}

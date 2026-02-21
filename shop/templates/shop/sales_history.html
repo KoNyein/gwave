@@ -1,0 +1,52 @@
+{% extends 'shop/base.html' %}
+{% block title %}ရောင်းအားစာရင်း — POS{% endblock %}
+
+{% block content %}
+<div class="page">
+  <div class="page-header">
+    <div class="page-title">📋 ရောင်းအားစာရင်း</div>
+    <a href="{% url 'dashboard' %}" class="btn btn-ghost">📊 Dashboard</a>
+  </div>
+
+  <div class="card">
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Sale #</th>
+            <th>ရက်စွဲ</th>
+            <th>ငွေပေးချေနည်း</th>
+            <th>Currency</th>
+            <th>စုစုပေါင်း</th>
+            <th>လျှော့ဈေး</th>
+            <th>ပေးရမည့်ငွေ</th>
+            <th>Cashier</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for sale in sales %}
+          <tr>
+            <td style="font-family:'JetBrains Mono',monospace;font-weight:700;color:var(--accent)">{{ sale.sale_number }}</td>
+            <td style="font-size:12px;color:var(--text2)">{{ sale.created_at|date:"d/m/Y H:i" }}</td>
+            <td>
+              {% if sale.payment_method == 'cash' %}<span class="badge badge-green">💵 Cash</span>
+              {% elif sale.payment_method == 'transfer' %}<span class="badge badge-blue">📱 Transfer</span>
+              {% else %}<span class="badge badge-yellow">💳 Card</span>{% endif %}
+            </td>
+            <td><span class="badge {% if sale.currency == 'MMK' %}badge-yellow{% else %}badge-blue{% endif %}">{{ sale.currency }}</span></td>
+            <td style="font-family:'JetBrains Mono',monospace">{{ sale.subtotal|floatformat:0 }}</td>
+            <td style="font-family:'JetBrains Mono',monospace;color:var(--accent2)">-{{ sale.discount|floatformat:0 }}</td>
+            <td style="font-family:'JetBrains Mono',monospace;font-weight:700;color:var(--accent)">{{ sale.total|floatformat:0 }} {{ sale.currency }}</td>
+            <td style="font-size:12px;color:var(--text2)">{{ sale.cashier|default:"—" }}</td>
+            <td><a href="{% url 'sale_detail' sale.pk %}" class="btn btn-sm btn-ghost">👁️</a></td>
+          </tr>
+          {% empty %}
+          <tr><td colspan="9" style="text-align:center;color:var(--text2);padding:40px">ရောင်းအားစာရင်း မရှိသေးပါ</td></tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+{% endblock %}

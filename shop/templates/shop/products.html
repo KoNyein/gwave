@@ -1,0 +1,61 @@
+{% extends 'shop/base.html' %}
+{% block title %}ကုန်ပစ္စည်းများ — POS{% endblock %}
+
+{% block content %}
+<div class="page">
+  <div class="page-header">
+    <div class="page-title">📦 ကုန်ပစ္စည်းများ</div>
+    <a href="{% url 'product_add' %}" class="btn btn-primary">+ ကုန်ပစ္စည်း ထည့်မည်</a>
+  </div>
+
+  <div class="card">
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>ကုန်ပစ္စည်း</th>
+            <th>Category</th>
+            <th>ဈေးနှုန်း (MMK)</th>
+            <th>ဈေးနှုန်း (THB)</th>
+            <th>Stock</th>
+            <th>အခြေအနေ</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for p in products %}
+          <tr>
+            <td><span style="font-size:18px">{{ p.emoji }}</span> <strong>{{ p.name }}</strong></td>
+            <td>{{ p.category|default:"—" }}</td>
+            <td style="font-family:'JetBrains Mono',monospace">{{ p.price_mmk|floatformat:0 }} ks</td>
+            <td style="font-family:'JetBrains Mono',monospace;color:var(--thb)">฿{{ p.price_thb|floatformat:0 }}</td>
+            <td style="font-family:'JetBrains Mono',monospace">
+              {% if p.is_out_of_stock %}
+                <span class="badge badge-red">ကုန်နေပြီ</span>
+              {% elif p.is_low_stock %}
+                <span class="badge badge-yellow">⚠️ {{ p.stock }}</span>
+              {% else %}
+                {{ p.stock }}
+              {% endif %}
+            </td>
+            <td>
+              {% if p.is_active %}
+                <span class="badge badge-green">Active</span>
+              {% else %}
+                <span class="badge badge-red">Inactive</span>
+              {% endif %}
+            </td>
+            <td>
+              <a href="{% url 'product_edit' p.pk %}" class="btn btn-sm btn-ghost">✏️ Edit</a>
+              <a href="{% url 'product_delete' p.pk %}" class="btn btn-sm btn-danger">🗑️</a>
+            </td>
+          </tr>
+          {% empty %}
+          <tr><td colspan="7" style="text-align:center;color:var(--text2);padding:40px">ကုန်ပစ္စည်း မရှိသေးပါ</td></tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+{% endblock %}

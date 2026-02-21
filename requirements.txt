@@ -1,0 +1,5 @@
+Django==4.2.9
+mysqlclient==2.2.4
+python-decouple==3.8
+djangorestframework==3.14.0
+Pillow==10.2.0
