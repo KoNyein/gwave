@@ -5,6 +5,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 
 SECRET_KEY = os.environ.get('SECRET_KEY', 'django-insecure-change-me-12345')
 
+
 DEBUG = False
 
 ALLOWED_HOSTS = ['*']
@@ -46,6 +47,8 @@ MIDDLEWARE = [
     'allauth.account.middleware.AccountMiddleware',  # ဒါထည့်
 ]
 
+import os
+PORT = os.environ.get('PORT', 8000)
 
 
 
