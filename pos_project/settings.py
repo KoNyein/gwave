@@ -32,7 +32,7 @@ MIDDLEWARE = [
 ROOT_URLCONF = 'pos_project.urls'
 
 TEMPLATES = [
-    {
+    
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
         'DIRS': [],
         'APP_DIRS': True,
@@ -42,4 +42,4 @@ TEMPLATES = [
                 
                 'django.template.backends.django.DjangoTemplates',
 
-            
+            ]
