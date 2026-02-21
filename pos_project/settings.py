@@ -1,11 +1,9 @@
 import os
 import pymysql
 pymysql.install_as_MySQLdb()
-
 from pathlib import Path
 
 BASE_DIR = Path(**file**).resolve().parent.parent
-
 SECRET_KEY = os.environ.get(‘SECRET_KEY’, ‘django-insecure-change-me’)
 DEBUG = False
 ALLOWED_HOSTS = [’*’]
@@ -73,7 +71,6 @@ TIME_ZONE = ‘Asia/Rangoon’
 STATIC_URL = ‘/static/’
 STATIC_ROOT = BASE_DIR / ‘staticfiles’
 STATICFILES_STORAGE = ‘whitenoise.storage.CompressedManifestStaticFilesStorage’
-
 DEFAULT_AUTO_FIELD = ‘django.db.models.BigAutoField’
 LOGIN_URL = ‘/login/’
 LOGIN_REDIRECT_URL = ‘/’
