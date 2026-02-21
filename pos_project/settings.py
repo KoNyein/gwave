@@ -1,31 +1,14 @@
 import os
-
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.mysql',
-        'NAME': os.environ.get('MYSQLDATABASE', ''),
-        'USER': os.environ.get('MYSQLUSER', ''),
-        'PASSWORD': os.environ.get('MYSQLPASSWORD', ''),
-        'HOST': os.environ.get('MYSQLHOST', ''),
-        'PORT': os.environ.get('MYSQLPORT', '3306'),
-        'OPTIONS': {
-            'charset': 'utf8mb4',
-        },
-    }
-}
-
-
-
-from decouple import config
-from pathlib import Path
 import pymysql
 pymysql.install_as_MySQLdb()
 
+from pathlib import Path
+from decouple import config
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-SECRET_KEY = config('SECRET_KEY', default='django-insecure-change-me-in-production')
-DEBUG = config('DEBUG', default=True, cast=bool)
+SECRET_KEY = os.environ.get('SECRET_KEY', 'django-insecure-fallback')
+DEBUG = False
 ALLOWED_HOSTS = ['*']
 
 INSTALLED_APPS = [
@@ -41,6 +24,7 @@ INSTALLED_APPS = [
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
+    'whitenoise.middleware.WhiteNoiseMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -51,53 +35,28 @@ MIDDLEWARE = [
 
 ROOT_URLCONF = 'pos_project.urls'
 
-TEMPLATES = [
-    {
-        'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
-        'APP_DIRS': True,
-        'OPTIONS': {
-            'context_processors': [
-                'django.template.context_processors.debug',
-                'django.template.context_processors.request',
-                'django.contrib.auth.context_processors.auth',
-                'django.contrib.messages.context_processors.messages',
-            ],
-        },
-    },
-]
+TEMPLATES = [{'BACKEND': 'django.template.backends.django.DjangoTemplates',
+    'DIRS': [], 'APP_DIRS': True,
+    'OPTIONS': {'context_processors': [
+        'django.template.context_processors.debug',
+        'django.template.context_processors.request',
+        'django.contrib.auth.context_processors.auth',
+        'django.contrib.messages.context_processors.messages',
+    ]},
+}]
 
 WSGI_APPLICATION = 'pos_project.wsgi.application'
 
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
-        'NAME': config('DB_NAME', default='pos_db'),
-        'USER': config('DB_USER', default='root'),
-        'PASSWORD': config('DB_PASSWORD', default=''),
-        'HOST': config('DB_HOST', default='localhost'),
-        'PORT': config('DB_PORT', default='3306'),
-        'OPTIONS': {
-            'charset': 'utf8mb4',
-        },
+        'NAME': os.environ.get('MYSQLDATABASE', 'railway'),
+        'USER': os.environ.get('MYSQLUSER', 'root'),
+        'PASSWORD': os.environ.get('MYSQLPASSWORD', ''),
+        'HOST': os.environ.get('MYSQLHOST', 'mysql.railway.internal'),
+        'PORT': os.environ.get('MYSQLPORT', '3306'),
+        'OPTIONS': {'charset': 'utf8mb4'},
     }
 }
 
-AUTH_PASSWORD_VALIDATORS = [
-    {'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator'},
-    {'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator'},
-    {'NAME': 'django.contrib.auth.password_validation.CommonPasswordValidator'},
-    {'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator'},
-]
-
-LANGUAGE_CODE = 'en-us'
-TIME_ZONE = 'Asia/Rangoon'
-USE_I18N = True
-USE_TZ = True
-
-STATIC_URL = '/static/'
-STATIC_ROOT = BASE_DIR / 'staticfiles'
-DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
-
-LOGIN_URL = '/login/'
-LOGIN_REDIRECT_URL = '/'
+LANGUAGE_CODE = 'en​​​​​​​​​​​​​​​​
