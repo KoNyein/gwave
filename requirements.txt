@@ -8,5 +8,11 @@ gunicorn==21.2.0
 whitenoise==6.6.0
 
 
+git add .
+git commit -m "Add Procfile for Railway"
+git push
+
+
+
 
 
