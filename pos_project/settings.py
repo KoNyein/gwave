@@ -1,5 +1,5 @@
 import os
-PORT = os.environ.get('PORT', 8080)
+PORT = os.environ.get('PORT', 8000)
 
 
 
@@ -77,5 +77,5 @@ TEMPLATES = [
     },
 ]
 import os
-PORT = int(os.environ.get('PORT', 8080))
+PORT = int(os.environ.get('PORT', 8000 ))
 
