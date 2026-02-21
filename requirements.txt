@@ -13,6 +13,10 @@ git commit -m "Add Procfile for Railway"
 git push
 
 
+pip install gunicorn
+pip freeze > requirements.txt
+
+
 
 
 
