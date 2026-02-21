@@ -60,3 +60,11 @@ DATABASES = {
 }
 
 LANGUAGE_CODE = 'en​​​​​​​​​​​​​​​​'
+# ဒါကို ဖျက်ပါ
+LANGUAGE_CODE = 'en'
+
+# ဒါနဲ့ အစားထိုးပါ
+LANGUAGE_CODE = 'en-us'
+USE_I18N = False
+USE_L10N = False
+
