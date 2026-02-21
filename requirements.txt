@@ -1,9 +1,9 @@
 Django
-mysqlclient
 gunicorn
+mysqlclient
+django-environ
 Pillow
-django-allauth
-
 requests
+PyJWT
+cryptography
 django-allauth
-
