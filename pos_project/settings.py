@@ -1,5 +1,30 @@
 import os
+from pathlib import Path
 import dj_database_url
+
+BASE_DIR = Path(__file__).resolve().parent.parent
+
+# ======================
+# SECURITY
+# ======================
+SECRET_KEY = os.environ.get("SECRET_KEY")
+
+DEBUG = False
+
+ALLOWED_HOSTS = [
+    "gwave.site",
+    "www.gwave.site",
+    ".railway.app",
+]
+
+CSRF_TRUSTED_ORIGINS = [
+    "https://gwave.site",
+    "https://www.gwave.site",
+]
+
+# ======================
+# DATABASE
+# ======================
 DATABASES = {
     "default": dj_database_url.config(
         default=os.environ.get("DATABASE_URL"),
@@ -8,31 +33,9 @@ DATABASES = {
     )
 }
 
-
-
-
-import os
-from pathlib import Path
-
-BASE_DIR = Path(__file__).resolve().parent.parent
-
-SECRET_KEY = os.environ.get('SECRET_KEY', 'django-insecure-change-me')
-
-
-ALLOWED_HOSTS = ["gwave.site", ".gwave.site", "*"]
-
-CSRF_TRUSTED_ORIGINS = [
-    "https://gwave.site",
-    "https://www.gwave.site",
-]
-
-DEBUG = False
-
-ALLOWED_HOSTS = [
-    "gwave.site",
-    "www.gwave.site"
-]
-
+# ======================
+# APPLICATIONS
+# ======================
 INSTALLED_APPS = [
     'django.contrib.admin',
     'django.contrib.auth',
@@ -53,8 +56,9 @@ INSTALLED_APPS = [
 
 SITE_ID = 1
 
-
-
+# ======================
+# MIDDLEWARE
+# ======================
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
@@ -68,6 +72,9 @@ MIDDLEWARE = [
 
 ROOT_URLCONF = 'pos_project.urls'
 
+# ======================
+# TEMPLATES
+# ======================
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
@@ -84,13 +91,13 @@ TEMPLATES = [
     },
 ]
 
+# ======================
+# AUTH
+# ======================
 AUTHENTICATION_BACKENDS = (
     'django.contrib.auth.backends.ModelBackend',
     'allauth.account.auth_backends.AuthenticationBackend',
 )
-
-
-
 
 LOGIN_URL = '/accounts/login/'
 LOGIN_REDIRECT_URL = '/'
