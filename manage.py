@@ -12,3 +12,4 @@ def main():
 
 if __name__ == '__main__':
     main()
+web: python manage.py migrate && python manage.py createsuperuser --noinput && gunicorn pos_project.wsgi
