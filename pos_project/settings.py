@@ -6,7 +6,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = os.environ.get('SECRET_KEY', 'django-insecure-change-me')
 
 
-from django.contrib.auth import get_user_model
+
 import os
 
 if os.environ.get("RAILWAY_ENVIRONMENT"):
