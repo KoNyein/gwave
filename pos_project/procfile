@@ -1,4 +1,0 @@
-web: python manage.py migrate && gunicorn pos_project.wsgi --bind 0.0.0.0:$PORT
-git add .
-git commit -m "Add Procfile"
-git push
