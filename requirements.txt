@@ -4,3 +4,5 @@ Django>=4.2
 gunicorn
 mysqlclient
 django-allauth
+
+requests>=2.31.0
