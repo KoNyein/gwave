@@ -1,30 +1,9 @@
 import os
-PORT = os.environ.get('PORT', 8000)
-
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.mysql',
-        'NAME': os.environ.get('MYSQL_DATABASE'),
-        'USER': os.environ.get('MYSQL_USER'),
-        'PASSWORD': os.environ.get('MYSQL_PASSWORD'),
-        'HOST': os.environ.get('MYSQL_HOST'),
-        'PORT': os.environ.get('MYSQL_PORT'),
-    }
-}
-
-
-
-
-
-
-
-import os
 from pathlib import Path
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-SECRET_KEY = os.environ.get('SECRET_KEY', 'django-insecure-change-me-12345')
-
+SECRET_KEY = os.environ.get('SECRET_KEY', 'django-insecure-change-me')
 
 DEBUG = False
 
@@ -38,23 +17,17 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'django.contrib.sites',
-'allauth',
-'allauth.account',
-'allauth.socialaccount',
-'allauth.socialaccount.providers.google',
-'allauth.socialaccount.providers.facebook',
 
-    
-    
+    'allauth',
+    'allauth.account',
+    'allauth.socialaccount',
+    'allauth.socialaccount.providers.google',
+    'allauth.socialaccount.providers.facebook',
+
     'shop',
 ]
 
-
 SITE_ID = 1
-LOGIN_REDIRECT_URL = '/'
-LOGOUT_REDIRECT_URL = '/'
-ACCOUNT_EMAIL_VERIFICATION = 'none'
-
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
@@ -64,20 +37,15 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-    'allauth.account.middleware.AccountMiddleware',  # ဒါထည့်
+    'allauth.account.middleware.AccountMiddleware',
 ]
 
-
-
 ROOT_URLCONF = 'pos_project.urls'
-
-
 
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
         'DIRS': [BASE_DIR / 'templates'],
-
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -89,6 +57,14 @@ TEMPLATES = [
         },
     },
 ]
-import os
-PORT = int(os.environ.get('PORT', 8000 ))
 
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.mysql',
+        'NAME': os.environ.get('MYSQL_DATABASE'),
+        'USER': os.environ.get('MYSQL_USER'),
+        'PASSWORD': os.environ.get('MYSQL_PASSWORD'),
+        'HOST': os.environ.get('MYSQL_HOST'),
+        'PORT': int(os.environ.get('MYSQL_PORT', 3306)),
+    }
+}
