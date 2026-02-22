@@ -7,9 +7,8 @@ def main():
     try:
         from django.core.management import execute_from_command_line
     except ImportError as exc:
-        raise ImportError("Django not installed.") from exc
+        raise
     execute_from_command_line(sys.argv)
 
 if __name__ == '__main__':
     main()
-web: python manage.py migrate && python manage.py createsuperuser --noinput && gunicorn pos_project.wsgi
