@@ -6,6 +6,19 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = os.environ.get('SECRET_KEY', 'django-insecure-change-me')
 
 
+from django.contrib.auth import get_user_model
+import os
+
+if os.environ.get("RAILWAY_ENVIRONMENT"):
+    User = get_user_model()
+    if not User.objects.filter(username="admin").exists():
+        User.objects.create_superuser(
+            username="admin",
+            email="admin@gwave.site",
+            password=os.environ.get("ADMIN_PASSWORD", "admin12345")
+        )
+
+
 DEBUG = True
 
 import os
