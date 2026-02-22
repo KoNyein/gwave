@@ -19,7 +19,7 @@ if os.environ.get("RAILWAY_ENVIRONMENT"):
         )
 
 
-DEBUG = True
+
 
 import os
 
