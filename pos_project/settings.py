@@ -5,10 +5,14 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 
 SECRET_KEY = os.environ.get('SECRET_KEY', 'django-insecure-change-me')
 
+
+
 DEBUG = False
 
-ALLOWED_HOSTS = ['*']
-
+ALLOWED_HOSTS = [
+    "gwave.site",
+    "www.gwave.site"
+]
 INSTALLED_APPS = [
     'django.contrib.admin',
     'django.contrib.auth',
