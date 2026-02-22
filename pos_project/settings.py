@@ -30,15 +30,13 @@ CSRF_TRUSTED_ORIGINS = [
     "https://www.gwave.site",
 ]
 
-
-
-
 DEBUG = False
 
 ALLOWED_HOSTS = [
     "gwave.site",
     "www.gwave.site"
 ]
+
 INSTALLED_APPS = [
     'django.contrib.admin',
     'django.contrib.auth',
@@ -58,6 +56,8 @@ INSTALLED_APPS = [
 ]
 
 SITE_ID = 1
+
+
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
