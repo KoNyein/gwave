@@ -7,6 +7,10 @@ SECRET_KEY = os.environ.get('SECRET_KEY', 'django-insecure-change-me')
 
 import os
 
+INSTALLED_APPS = [
+    'core.apps.CoreConfig',
+]
+
 
 
 DEBUG = False
