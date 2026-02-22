@@ -1,31 +1,4 @@
-import dj_database_url
-import os
 
-DATABASES = {
-    "default": dj_database_url.config(
-        default=os.environ.get("DATABASE_URL"),
-        conn_max_age=600,
-        ssl_require=True,
-    )
-}
-import os
-import dj_database_url
-
-DATABASES = {
-    'default': dj_database_url.parse(
-        os.environ.get("DATABASE_URL")
-    )
-}
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.postgresql',
-        'NAME': os.environ.get('PGDATABASE'),
-        'USER': os.environ.get('PGUSER'),
-        'PASSWORD': os.environ.get('PGPASSWORD'),
-        'HOST': os.environ.get('PGHOST'),
-        'PORT': os.environ.get('PGPORT'),
-    }
-}
 
 
 
@@ -108,16 +81,7 @@ AUTHENTICATION_BACKENDS = (
 )
 
 
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.mysql',
-        'NAME': os.environ.get('MYSQL_DATABASE'),
-        'USER': os.environ.get('MYSQL_USER'),
-        'PASSWORD': os.environ.get('MYSQL_PASSWORD'),
-        'HOST': os.environ.get('MYSQL_HOST'),
-        'PORT': os.environ.get('MYSQL_PORT', '3306'),
-    }
-}
+
 
 LOGIN_URL = '/accounts/login/'
 LOGIN_REDIRECT_URL = '/'
@@ -127,27 +91,15 @@ ACCOUNT_AUTHENTICATION_METHOD = 'username_email'
 ACCOUNT_EMAIL_REQUIRED = False
 ACCOUNT_USERNAME_REQUIRED = True
 ACCOUNT_EMAIL_VERIFICATION = 'none'
-import dj_database_url
-
-DATABASES = {
-    'default': dj_database_url.config(
-        default=os.environ.get("DATABASE_URL"),
-        conn_max_age=600,
-        ssl_require=True
-    )
-}
-
-import os
-import dj_database_url
 
 
 import dj_database_url
 import os
 
 DATABASES = {
-    'default': dj_database_url.config(
+    "default": dj_database_url.config(
         default=os.environ.get("DATABASE_URL"),
         conn_max_age=600,
-        ssl_require=True
+        ssl_require=True,
     )
 }
