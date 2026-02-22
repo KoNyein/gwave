@@ -7,15 +7,6 @@ SECRET_KEY = os.environ.get('SECRET_KEY', 'django-insecure-change-me')
 
 import os
 
-if os.environ.get("RAILWAY_ENVIRONMENT"):
-    
-    if not User.objects.filter(username="admin").exists():
-        User.objects.create_superuser(
-            "admin",
-            "admin@example.com",
-            "admin12345"
-        )
-
 
 
 DEBUG = False
