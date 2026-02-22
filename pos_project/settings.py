@@ -10,7 +10,12 @@ import os
 INSTALLED_APPS = [
     'core.apps.CoreConfig',
 ]
+ALLOWED_HOSTS = ["gwave.site", ".gwave.site", "*"]
 
+CSRF_TRUSTED_ORIGINS = [
+    "https://gwave.site",
+    "https://www.gwave.site",
+]
 
 
 DEBUG = False
